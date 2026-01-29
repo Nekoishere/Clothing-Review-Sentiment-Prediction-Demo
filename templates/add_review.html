@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Review - {{ item['Clothes Title'] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Women's Clothing Store</h1>
+            <p class="tagline">Browse, Review, and Recommend</p>
+        </div>
+    </header>
+
+    <nav class="breadcrumb">
+        <div class="container">
+            <a href="{{ url_for('index') }}">Home</a> &gt;
+            <a href="{{ url_for('item_detail', clothing_id=clothing_id) }}">{{ item['Clothes Title'] }}</a> &gt;
+            <span>Add Review</span>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="add-review-section">
+            <h1>Write Your Review</h1>
+
+            <div class="item-preview">
+                <h3>{{ item['Clothes Title'] }}</h3>
+                <p>{{ item['Clothes Description'] }}</p>
+            </div>
+
+            {% if show_prediction %}
+            <!-- Show ML Prediction -->
+            <div class="prediction-section">
+                <h2>AI Recommendation Prediction</h2>
+                <div class="prediction-result">
+                    <p>Based on your review, our machine learning model predicts:</p>
+                    <div class="prediction-badge {% if prediction == 1 %}prediction-positive{% else %}prediction-negative{% endif %}">
+                        {% if prediction == 1 %}
+                        <strong>✓ You will RECOMMEND this item</strong>
+                        <p class="confidence">Confidence: {{ "%.1f"|format(prediction_proba[1] * 100) }}%</p>
+                        {% else %}
+                        <strong>✗ You will NOT RECOMMEND this item</strong>
+                        <p class="confidence">Confidence: {{ "%.1f"|format(prediction_proba[0] * 100) }}%</p>
+                        {% endif %}
+                    </div>
+
+                    <p class="prediction-note">You can accept this prediction or change it below.</p>
+                </div>
+
+                <!-- Confirmation Form -->
+                <form method="post" class="confirmation-form">
+                    <input type="hidden" name="title" value="{{ form_data.title }}">
+                    <input type="hidden" name="review_text" value="{{ form_data.review_text }}">
+                    <input type="hidden" name="rating" value="{{ form_data.rating }}">
+                    <input type="hidden" name="age" value="{{ form_data.age }}">
+                    <input type="hidden" name="override" value="1">
+
+                    <div class="form-group">
+                        <label for="recommendation"><strong>Final Recommendation:</strong></label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="recommendation" value="1" {% if prediction == 1 %}checked{% endif %}>
+                                <span>✓ I recommend this item</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="recommendation" value="0" {% if prediction == 0 %}checked{% endif %}>
+                                <span>✗ I do not recommend this item</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success">Submit Review</button>
+                        <a href="{{ url_for('add_review', clothing_id=clothing_id) }}" class="btn btn-secondary">Edit Review</a>
+                    </div>
+                </form>
+            </div>
+
+            {% else %}
+            <!-- Review Form -->
+            <form method="post" class="review-form">
+                <div class="form-group">
+                    <label for="title">Review Title *</label>
+                    <input type="text"
+                           id="title"
+                           name="title"
+                           placeholder="Summarize your experience (e.g., 'Perfect fit!', 'Not what I expected')"
+                           required
+                           maxlength="200">
+                </div>
+
+                <div class="form-group">
+                    <label for="review_text">Review Description *</label>
+                    <textarea id="review_text"
+                              name="review_text"
+                              rows="6"
+                              placeholder="Share your detailed thoughts about this item... What did you like or dislike? How was the fit, quality, and style?"
+                              required
+                              maxlength="2000"></textarea>
+                    <small>Our AI will analyze your review to predict your recommendation.</small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="rating">Rating *</label>
+                        <select id="rating" name="rating" required>
+                            <option value="5">★★★★★ (5 - Excellent)</option>
+                            <option value="4">★★★★☆ (4 - Good)</option>
+                            <option value="3" selected>★★★☆☆ (3 - Average)</option>
+                            <option value="2">★★☆☆☆ (2 - Poor)</option>
+                            <option value="1">★☆☆☆☆ (1 - Terrible)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">Your Age *</label>
+                        <input type="number"
+                               id="age"
+                               name="age"
+                               min="13"
+                               max="120"
+                               value="30"
+                               required>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Get AI Prediction</button>
+                    <a href="{{ url_for('item_detail', clothing_id=clothing_id) }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Advanced Programming for Data Science - Assignment 3 Milestone II</p>
+        </div>
+    </footer>
+</body>
+</html>

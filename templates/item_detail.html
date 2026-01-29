@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ item['Clothes Title'] }} - Item Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Women's Clothing Store</h1>
+            <p class="tagline">Browse, Review, and Recommend</p>
+        </div>
+    </header>
+
+    <nav class="breadcrumb">
+        <div class="container">
+            <a href="{{ url_for('index') }}">Home</a> &gt; <span>{{ item['Clothes Title'] }}</span>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- Item Information -->
+        <section class="item-details">
+            <div class="item-info-card">
+                <h1>{{ item['Clothes Title'] }}</h1>
+                <p class="item-description-full">{{ item['Clothes Description'] }}</p>
+
+                <div class="item-metadata">
+                    <div class="meta-item">
+                        <strong>Category:</strong> {{ item['Class Name'] }}
+                    </div>
+                    <div class="meta-item">
+                        <strong>Department:</strong> {{ item['Department Name'] }}
+                    </div>
+                    <div class="meta-item">
+                        <strong>Division:</strong> {{ item['Division Name'] }}
+                    </div>
+                    <div class="meta-item">
+                        <strong>Item ID:</strong> {{ item['Clothing ID'] }}
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="{{ url_for('add_review', clothing_id=clothing_id) }}" class="btn btn-success">
+                        ✍ Write a Review
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reviews Section -->
+        <section class="reviews-section">
+            <h2>Customer Reviews ({{ reviews|length }})</h2>
+
+            {% if reviews %}
+            <div class="reviews-list">
+                {% for review in reviews %}
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-title-section">
+                            <h3>{{ review['Title'] }}</h3>
+                            <div class="review-rating">
+                                {% for i in range(review['Rating']) %}
+                                ★
+                                {% endfor %}
+                                {% for i in range(5 - review['Rating']) %}
+                                ☆
+                                {% endfor %}
+                                <span class="rating-number">{{ review['Rating'] }}/5</span>
+                            </div>
+                        </div>
+                        <div class="review-recommendation">
+                            {% if review['Recommended IND'] == 1 %}
+                            <span class="badge badge-success">✓ Recommended</span>
+                            {% else %}
+                            <span class="badge badge-danger">✗ Not Recommended</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="review-body">
+                        <p>{{ review['Review Text'] }}</p>
+                    </div>
+
+                    <div class="review-footer">
+                        <span class="reviewer-age">Age: {{ review['Age'] }}</span>
+                        <span class="helpful-count">{{ review['Positive Feedback Count'] }} people found this helpful</span>
+                        {% if review.get('Created At') %}
+                        <span class="review-date">Posted: {{ review['Created At'] }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-reviews">
+                <p>No reviews yet. Be the first to review this item!</p>
+                <a href="{{ url_for('add_review', clothing_id=clothing_id) }}" class="btn btn-primary">
+                    Write the First Review
+                </a>
+            </div>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Advanced Programming for Data Science - Assignment 3 Milestone II</p>
+        </div>
+    </footer>
+</body>
+</html>
